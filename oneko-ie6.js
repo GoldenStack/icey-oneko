@@ -15,7 +15,10 @@ function neko() {
 
   var IE = document.all ? true : false;
 
-  var nekoSpeed = 10;
+  const nekoAcceleration = 3;
+  let nekoSpeedX = 0;
+  let nekoSpeedY = 0;
+
   var spriteSets = {
     idle: [[-3, -3]],
     alert: [[-7, -3]],
@@ -188,7 +191,7 @@ function neko() {
     var diffY = nekoPosY - mousePosY;
     var distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
 
-    if (distance < nekoSpeed || distance < 48) {
+    if (distance < 32 && Math.hypot(nekoSpeedX, nekoSpeedY) < 2) {
       idle();
       return;
     }
@@ -217,13 +220,14 @@ function neko() {
     }
     setSprite(direction, frameCount);
 
-    if (distance > nekoSpeed) {
-      nekoPosX = nekoPosX - (diffX / distance) * nekoSpeed;
-      nekoPosY = nekoPosY - (diffY / distance) * nekoSpeed;
-    } else {
-      nekoPosX = mousePosX;
-      nekoPosY = mousePosY;
-    }
+    nekoSpeedX += (diffX / distance) * nekoAcceleration;
+    nekoSpeedY += (diffY / distance) * nekoAcceleration;
+
+    nekoSpeedX *= 0.95;
+    nekoSpeedY *= 0.95;
+
+    nekoPosX -= nekoSpeedX;
+    nekoPosY -= nekoSpeedY;
 
     nekoPosX = Math.min(
       Math.max(16, nekoPosX),

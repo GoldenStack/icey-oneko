@@ -20,7 +20,10 @@
   let idleAnimation = null;
   let idleAnimationFrame = 0;
 
-  const nekoSpeed = 10;
+  const nekoAcceleration = 3;
+  let nekoSpeedX = 0;
+  let nekoSpeedY = 0;
+
   const spriteSets = {
     idle: [[-3, -3]],
     alert: [[-7, -3]],
@@ -202,7 +205,7 @@
     const diffY = nekoPosY - mousePosY;
     const distance = Math.sqrt(diffX ** 2 + diffY ** 2);
 
-    if (distance < nekoSpeed || distance < 48) {
+    if (distance < 32 && Math.hypot(nekoSpeedX, nekoSpeedY) < 2) {
       idle();
       return;
     }
@@ -225,8 +228,14 @@
     direction += diffX / distance < -0.5 ? "E" : "";
     setSprite(direction, frameCount);
 
-    nekoPosX -= (diffX / distance) * nekoSpeed;
-    nekoPosY -= (diffY / distance) * nekoSpeed;
+    nekoSpeedX += (diffX / distance) * nekoAcceleration;
+    nekoSpeedY += (diffY / distance) * nekoAcceleration;
+
+    nekoSpeedX *= 0.95;
+    nekoSpeedY *= 0.95;
+
+    nekoPosX -= nekoSpeedX;
+    nekoPosY -= nekoSpeedY;
 
     nekoPosX = Math.min(Math.max(16, nekoPosX), window.innerWidth - 16);
     nekoPosY = Math.min(Math.max(16, nekoPosY), window.innerHeight - 16);
